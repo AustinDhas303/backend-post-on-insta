@@ -3,6 +3,7 @@ package com.cms.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cms.dto.ApiResponse;
@@ -25,6 +27,8 @@ import com.cms.service.UserService;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
+@PreAuthorize("hasAuthority('Admin')")
+@RequestMapping("/admin")
 public class UserController {
 
 	private final UserService userService;
@@ -32,29 +36,6 @@ public class UserController {
 	public UserController(UserService userService) {
 		super();
 		this.userService = userService;
-	}
-
-	@PostMapping("/createuser")
-	public ResponseEntity<ApiResponse> createUser(@RequestBody UserDTO userDTO ){
-		try {
-            String message = userService.createUser(userDTO);
-            return ResponseEntity.ok(new ApiResponse(true, message));
-        } catch (RuntimeException ex) {
-            return ResponseEntity.badRequest().body(new ApiResponse(false, ex.getMessage()));
-        }
-
-	}
-	
-	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody Login login ){
-		try {
-            User user = userService.validateUser(login.getEmailId(), login.getPassword());
-            String token = JwtUtility.generateToken(user.getEmailId());
-            return ResponseEntity.ok(new JwtResponse(token));
-        } catch (RuntimeException ex) {
-            return ResponseEntity.status(401).body(ex.getMessage());
-        }
-		
 	}
 	
 	@DeleteMapping("/deleteuser/{userId}")
@@ -68,11 +49,6 @@ public class UserController {
 		ResponseDTO responseDTO=userService.getAllUsers();
 		return new ResponseEntity<>(responseDTO,HttpStatus.OK);
 	}
-	
-	@PostMapping("/userlogin")
-	   public Object loginUser(@RequestBody LoginDTO loginDTO) {
-	     return userService.loginUser(loginDTO);
-	   }
 	
 //	@PostMapping("/userlogin")
 //	public ResponseEntity<?> loginUser(@RequestBody Login login) {

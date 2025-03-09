@@ -1,6 +1,8 @@
 package com.cms.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -11,13 +13,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.cms.dto.ContentDTO;
 import com.cms.dto.ResponseUserHistoryDTO;
 import com.cms.dto.UserHistoryDTO;
 import com.cms.model.UserHistory;
+import com.cms.service.ContentService;
 import com.cms.service.UserHistoryService;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -26,6 +33,9 @@ public class UserHistoryController {
 
 	 @Autowired
 	   private UserHistoryService userHistoryService;
+	 
+	 @Autowired
+	 private ContentService contentService;
 
 	 @PostMapping("/createuserhistory")
 	 public ResponseEntity<Map<String, Object>> createUserHistory(@RequestBody UserHistoryDTO userHistoryDTO) {
@@ -45,11 +55,11 @@ public class UserHistoryController {
 	     return ResponseEntity.ok(response);
 	 }
 	   
-	   @GetMapping("/fetchalluserhistory")
-	   public ResponseEntity<ResponseUserHistoryDTO> getAllUserHistory(){
-		   ResponseUserHistoryDTO responseUserHistoryDTO =userHistoryService.getAllUserHistory();
-		   return new ResponseEntity<>(responseUserHistoryDTO,HttpStatus.OK);
-	   }
+	 @GetMapping("/user/{userid}/newquiz")
+	    public ResponseEntity<ContentDTO> getContentById(@PathVariable("userid") Long userId) {
+	        ContentDTO contentDTO = contentService.getContentById(userId);
+	        return new ResponseEntity<>(contentDTO, HttpStatus.OK);
+	    }
 
 	    @GetMapping("/fetchuserhistory/{userHistoryId}")
 	    public ResponseEntity<UserHistoryDTO> fetchUserHistoryById(@PathVariable Long userHistoryId) {
@@ -80,4 +90,41 @@ public class UserHistoryController {
 	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Failed to save video history"));
 	        }
 	    }
+	    
+	    @GetMapping("/stream")
+	    public ResponseEntity<InputStreamResource> streamVideo(@RequestParam String videoPath) throws FileNotFoundException{
+	    System.err.println("Eneter Video Get Method ------------------>"+videoPath);
+	        File videoFile = new File(videoPath);
+	        InputStreamResource resource = new InputStreamResource(new FileInputStream(videoFile));
+
+	        HttpHeaders headers = new HttpHeaders();
+	        headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=sample.mp4");
+	        headers.setContentType(org.springframework.http.MediaType.valueOf("video/mp4"));
+
+	        return ResponseEntity.ok()
+	                .headers(headers)
+	                .contentLength(videoFile.length())
+	                .body(resource);
+	    }
+		
+		@GetMapping("/image")
+		public ResponseEntity<InputStreamResource> fetchImage(@RequestParam String imagePath) throws FileNotFoundException {
+		    System.err.println("Fetching Image ------------------> " + imagePath);
+
+		    File imageFile = new File(imagePath);
+		    if (!imageFile.exists()) {
+		        throw new FileNotFoundException("Image not found at path: " + imagePath);
+		    }
+
+		    InputStreamResource resource = new InputStreamResource(new FileInputStream(imageFile));
+
+		    HttpHeaders headers = new HttpHeaders();
+		    headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + imageFile.getName());
+		    headers.setContentType(org.springframework.http.MediaType.IMAGE_JPEG); // Change to IMAGE_PNG if needed
+
+		    return ResponseEntity.ok()
+		            .headers(headers)
+		            .contentLength(imageFile.length())
+		            .body(resource);
+		}
 }

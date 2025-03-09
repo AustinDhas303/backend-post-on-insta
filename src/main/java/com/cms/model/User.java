@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.cms.dto.UserDTO;
 
@@ -33,7 +34,7 @@ public class User {
 	@Column(name="LastName",length=30) 
 	private String lastName;
 	
-	@Column(name = "Password",length=16)
+	@Column(name = "Password")
 	private String password;
 	
 	@Column(name = "Email",length=45)
@@ -81,7 +82,7 @@ public User(UserDTO userDto) {
 //		this.userId = userDto.getUse;
 		this.firstName = userDto.getFirstName();
 		this.lastName = userDto.getLastName();
-		this.password = userDto.getPassword();
+		this.password = new BCryptPasswordEncoder().encode(userDto.getPassword());
 		this.emailId = userDto.getEmailId();
 		this.status = userDto.getStatus();
 		this.contactNo = userDto.getContactNo();
@@ -106,7 +107,7 @@ public User(UserDTO userDto) {
 //		this.updated_At=ZonedDateTime.now();
 //	}
 
-	public User() {
+public User() {
 	super();
 	// TODO Auto-generated constructor stub
 }
@@ -231,8 +232,6 @@ public User(UserDTO userDto) {
 
 	public void setRole(Role role) {
 		this.role = role;
-	}
-
-		
+	}		
 
 }
