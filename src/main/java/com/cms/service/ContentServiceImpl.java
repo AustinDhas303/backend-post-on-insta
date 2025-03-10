@@ -43,9 +43,9 @@ public class ContentServiceImpl implements ContentService{
 	}
 
 	@Override
-	public ContentDTO getContentById(Long userId) {
+	public ContentDTO getContentById(Long userId, String categoryName) {
 		// TODO Auto-generated method stub
-		Content content = contentRepository.findContentByDate(new Date(System.currentTimeMillis()));
+		Content content = contentRepository.findContentByDate(new Date(System.currentTimeMillis()), categoryName);
 		content = content != null
 				&& userHistoryRepository.findByUserUserIdAndContentContentId(userId, content.getContentId()) != null
 						? null

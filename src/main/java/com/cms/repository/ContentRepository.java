@@ -30,7 +30,7 @@ public interface ContentRepository extends JpaRepository<Content, Integer>{
 
 	Optional<Content> findByContentId(Integer contentId);
 	
-	@Query(value = "SELECT * FROM content WHERE DATE_FORMAT(updated_date, '%Y-%m-%d') = :currentDate ORDER BY content_id DESC LIMIT 1",nativeQuery = true)
-	Content findContentByDate(Date currentDate);
+	@Query(value = "SELECT c.* FROM content AS c LEFT JOIN category AS ca ON ca.category_id = c.category_id WHERE DATE_FORMAT(updated_date, '%Y-%m-%d') = ?1 AND ca.category_name = ?2 ORDER BY content_id DESC LIMIT 1",nativeQuery = true)
+	Content findContentByDate(Date currentDate, String categoryName);
 
 }

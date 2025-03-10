@@ -14,7 +14,7 @@ public interface ContentService {
 
 	Content saveContent(Content content);
 
-	ContentDTO getContentById(Long userId);
+	ContentDTO getContentById(Long userId, String categoryName);
 
 	Content updateContent(Integer contentId, ContentDTO contentDTO);
 

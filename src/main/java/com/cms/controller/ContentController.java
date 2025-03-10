@@ -57,12 +57,6 @@ public class ContentController {
         ResponseContentDTO responseDTO = contentService.getAllContents();
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
-	
-	@GetMapping("/user/{userid}/newquiz")
-    public ResponseEntity<ContentDTO> getContentById(@PathVariable("userid") Long userId) {
-        ContentDTO contentDTO = contentService.getContentById(userId);
-        return new ResponseEntity<>(contentDTO, HttpStatus.OK);
-    }
 
     @PutMapping("/updatecontent/{contentId}")
     public ResponseEntity<String> updateContent(
