@@ -14,9 +14,9 @@ public interface CategoryService {
 
     Map<String, Object> create(CategoryDTO categoryDTO);
 
-    Category deleteCategorybyId(Integer categoryId);
+    Map<String, String> deleteCategorybyId(Integer categoryId);
 
-    Category updatecategory(Integer categoryId, CategoryDTO categoryDTO);
+    Map<String, String> updatecategory(CategoryDTO categoryDTO);
 
     
 }

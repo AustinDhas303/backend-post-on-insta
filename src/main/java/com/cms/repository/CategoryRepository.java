@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Integer>{
 
-	@Query("Select c from Category c where (:categoryName IS NULL OR c.categoryName =:categoryName)")
+	@Query("Select c from Category c where (:categoryName IS NULL or LOWER(c.categoryName) like lower(concat(:categoryName, '%')) )")
 	List<Category> getCategory(@Param("categoryName") String categoryName);
 
 	@Query("Select c from Category c where c.categoryName =:categoryName")

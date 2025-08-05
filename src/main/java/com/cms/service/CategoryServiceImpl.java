@@ -102,24 +102,54 @@ public class CategoryServiceImpl implements CategoryService{
     }
     
     @Override
-    public Category deleteCategorybyId(Integer categoryId) {
-    Category deleteCategory=categoryRepository.findById(categoryId).orElse(null);
-    categoryRepository.deleteById(categoryId);
-        return deleteCategory;
+    public Map<String, String> deleteCategorybyId(Integer categoryId) {
+    	UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String email = userDetails.getUsername();
+		User user = userRepository.getEmail(email);
+		Map<String, String> map = new HashMap<String, String>();
+		if(user.getRole().getRoleId() == 1) {
+			Category deleteCategory=categoryRepository.findById(categoryId).orElse(null);
+			if(deleteCategory != null) {
+			    categoryRepository.deleteById(categoryId);
+			    map.put("status", "success");
+	            map.put("message", "Category deleted successfully");
+			}else {
+				map.put("error", "Category not found");
+				return map;
+			}
+		}else {
+			map.put("message", "Admin only can delete category");
+			return map;
+		}
+        return map;
     }
 
     @Override
-    public Category updatecategory(Integer categoryId, CategoryDTO categoryDTO) {
+    public Map<String, String> updatecategory(CategoryDTO categoryDTO) {
         // TODO Auto-generated method stub
+    	UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String email = userDetails.getUsername();
+		User user = userRepository.getEmail(email);
+		Map<String, String> map = new HashMap<String, String>();
+		if(user.getRole().getRoleId() == 1) {
+			Category category=categoryRepository.findById(categoryDTO.getCategoryId()).orElse(null);
+            if(category!=null) {
+            category.setCategoryName(categoryDTO.getCategoryName());
+            category.setCategoryDescription(categoryDTO.getCategoryDescription());
+            category.setPoints(categoryDTO.getPoints());
+            categoryRepository.save(category);
+		    map.put("status", "success");
+            map.put("message", "Category updated successfully");
+            }else {
+            	map.put("error", "Category not found");
+				return map;
+            }
+		}else {
+			map.put("message", "Admin only can update category");
+			return map;
+		}
                   
-                    Category category=categoryRepository.findById(categoryId).orElse(null);
-                    if(category!=null) {
-                    category.setCategoryName(categoryDTO.getCategoryName());
-                    category.setCategoryDescription(categoryDTO.getCategoryDescription());
-                    category.setPoints(categoryDTO.getPoints());
-                    }
-                    return categoryRepository.save(category);
-        
+        return map;
     }
 
 }
