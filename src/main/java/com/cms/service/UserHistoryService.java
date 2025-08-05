@@ -2,7 +2,7 @@ package com.cms.service;
 
 import java.util.List;
 
-import com.cms.dto.ResponseUserHistoryDTO;
+import com.cms.dto.UserHistoryResponseDTO;
 import com.cms.dto.UserHistoryDTO;
 import com.cms.model.UserHistory;
 
@@ -10,7 +10,7 @@ public interface UserHistoryService {
 
 	UserHistory createUserHistory(UserHistoryDTO userHistoryDTO);
 
-	ResponseUserHistoryDTO getAllUserHistory();
+	UserHistoryResponseDTO getAllUserHistory();
 
 	UserHistoryDTO fetchUserHistoryById(Long userHistoryId);
 

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.cms.dto.ResponseUserHistoryDTO;
+import com.cms.dto.UserHistoryResponseDTO;
 import com.cms.dto.UserHistoryDTO;
 import com.cms.model.Content;
 import com.cms.model.User;
@@ -109,9 +109,9 @@ public class UserHistoryServiceImpl implements UserHistoryService{
 
 
 	@Override
-	public ResponseUserHistoryDTO getAllUserHistory() {
+	public UserHistoryResponseDTO getAllUserHistory() {
 		// TODO Auto-generated method stub
-		ResponseUserHistoryDTO responseUserHistoryDTO=new ResponseUserHistoryDTO();
+		UserHistoryResponseDTO responseUserHistoryDTO=new UserHistoryResponseDTO();
 		List<UserHistoryDTO> userHistoryDTOs=new ArrayList<>();
 		List<UserHistory> userHistories =userHistoryRepository.findAll();
 		

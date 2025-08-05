@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.cms.dto.ResponseUserHistoryDTO;
+import com.cms.dto.UserHistoryResponseDTO;
 import com.cms.dto.UserHistoryDTO;
 import com.cms.service.UserHistoryService;
 
@@ -26,8 +26,8 @@ public class FetchallUserHistoryController {
 	   private UserHistoryService userHistoryService;
 	 
 	 @GetMapping("/fetchalluserhistory")
-	   public ResponseEntity<ResponseUserHistoryDTO> getAllUserHistory(){
-		   ResponseUserHistoryDTO responseUserHistoryDTO =userHistoryService.getAllUserHistory();
+	   public ResponseEntity<UserHistoryResponseDTO> getAllUserHistory(){
+		   UserHistoryResponseDTO responseUserHistoryDTO =userHistoryService.getAllUserHistory();
 		   return new ResponseEntity<>(responseUserHistoryDTO,HttpStatus.OK);
 	   }
 }

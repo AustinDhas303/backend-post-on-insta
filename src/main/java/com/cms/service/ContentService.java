@@ -1,26 +1,22 @@
 package com.cms.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.cms.dto.ContentDTO;
-import com.cms.dto.ResponseContentDTO;
-import com.cms.model.Content;
+import com.cms.dto.ContentSearchDTO;
 
 public interface ContentService {
 
-//	void deleteContentById(int id);
-
-//	Content saveContent(Content content);
-
-	Content saveContent(Content content);
+	Map<String, Object> saveContent(ContentDTO contentDTO);
 
 	ContentDTO getContentById(Long userId, String categoryName);
 
-	Content updateContent(Integer contentId, ContentDTO contentDTO);
+	Map<String, Object> updateContent(Integer contentId, ContentDTO contentDTO);
 
-	Content deleteContentById(Integer contentId);
+	Map<String, Object> deleteContentById(Integer contentId);
 
-	ResponseContentDTO getAllContents();
+	Map<String, Object> getAllContents(ContentSearchDTO contentSearchDTO);
 
 	ContentDTO findByContentIdAndCategoryId(int contentId, int categoryId);
 

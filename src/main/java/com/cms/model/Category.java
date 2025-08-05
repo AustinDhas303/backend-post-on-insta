@@ -1,6 +1,11 @@
 package com.cms.model;
 
 import java.time.ZonedDateTime;
+import java.util.Date;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,7 +14,11 @@ import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import lombok.Data;
 
+@Data
 @Entity
 @Table(name = "category")
 public class Category {
@@ -31,87 +40,13 @@ public class Category {
     @Column(name = "category_active")
     private Boolean active;
 
-    @Column(name = "created_at")
-    private ZonedDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private ZonedDateTime updatedAt;
-    
-    
-   
-
-    @PrePersist
-    public void onCreate() {
-        ZonedDateTime now = ZonedDateTime.now();
-        this.createdAt = now;
-        this.updatedAt = now;
-        this.active=true;
-    }
-
-
-
-
-
-    @PreUpdate
-    public void onUpdate() {
-        this.updatedAt = ZonedDateTime.now();
-    }
-
-  
-
-    public int getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    public String getCategoryDescription() {
-        return categoryDescription;
-    }
-
-    public void setCategoryDescription(String categoryDescription) {
-        this.categoryDescription = categoryDescription;
-    }
-
-    public int getPoints() {
-        return points;
-    }
-
-    public void setPoints(int points) {
-        this.points = points;
-    }
-
-    public Boolean getActive() {
-        return active;
-    }
-
-    public void setActive(Boolean active) {
-        this.active = active;
-    }
-
-    public ZonedDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(ZonedDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public ZonedDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(ZonedDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    @Column(name = "CreatedAt",updatable =false)
+	@CreationTimestamp
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date createdAt;
+	
+	@Column(name = "UpdatedAt")
+	@UpdateTimestamp
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date updatedAt;
 }

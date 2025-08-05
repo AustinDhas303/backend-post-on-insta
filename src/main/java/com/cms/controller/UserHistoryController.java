@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.cms.dto.ContentDTO;
-import com.cms.dto.ResponseUserHistoryDTO;
+import com.cms.dto.UserHistoryResponseDTO;
 import com.cms.dto.UserHistoryDTO;
 import com.cms.model.UserHistory;
 import com.cms.service.ContentService;

@@ -1,22 +1,27 @@
 package com.cms.service;
 
-import com.cms.dto.Login;
-import com.cms.dto.LoginDTO;
+import java.util.Map;
+
 import com.cms.dto.ResponseDTO;
 import com.cms.dto.UserDTO;
+import com.cms.dto.UserSearchDTO;
 import com.cms.model.User;
 
 public interface UserService {
 
-	String createUser(UserDTO userDTO);
+//	String createUser(UserDTO userDTO);
 
 	User validateUser(String emailId, String password);
 
-	User deleteUser(Long userId);
+	Map<String, String> deleteUser(Long userId);
 
-	ResponseDTO getAllUsers();
+	ResponseDTO getAllUsers(int page, int size, String userName);
 
 //	User loginUser(String emailId, String password);
 
-	Object loginUser(LoginDTO loginDTO);
+//	Object loginUser(LoginDTO loginDTO);
+
+	Object logout();
+
+	Map<String, String> updateUser(UserDTO userDTO);
 }

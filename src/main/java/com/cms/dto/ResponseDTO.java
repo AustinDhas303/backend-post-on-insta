@@ -2,16 +2,10 @@ package com.cms.dto;
 
 import java.util.List;
 
+import lombok.Data;
+
+@Data
 public class ResponseDTO {
 	private List<UserDTO> userDTO;
-
-	public List<UserDTO> getUserDTO() {
-		return userDTO;
-	}
-
-	public void setUserDTO(List<UserDTO> userDTO) {
-		this.userDTO = userDTO;
-	}
-	
 
 }

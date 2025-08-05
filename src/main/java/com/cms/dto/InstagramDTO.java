@@ -1,5 +1,8 @@
 package com.cms.dto;
 
+import lombok.Data;
+
+@Data
 public class InstagramDTO {
 	
 	private String imageUrl;
@@ -13,26 +16,6 @@ public class InstagramDTO {
         this.imageUrl = imageUrl;
         this.accessToken = accessToken;
         this.caption = caption;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
-
-    public String getAccessToken() {
-        return accessToken;
-    }
-
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-
-    public String getCaption() {
-        return caption;
     }
 
 }
