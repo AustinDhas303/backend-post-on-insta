@@ -2,6 +2,9 @@ package com.cms.dto;
 
 import com.cms.model.User;
 
+import lombok.Data;
+
+@Data
 public class ApiResponse {
 	
 	    private boolean success;
@@ -13,21 +16,5 @@ public class ApiResponse {
 		}
 		public ApiResponse(boolean b, String string, User user) {
 			// TODO Auto-generated constructor stub
-		}
-		public boolean isSuccess() {
-			return success;
-		}
-		public void setSuccess(boolean success) {
-			this.success = success;
-		}
-		public String getMessage() {
-			return message;
-		}
-		public void setMessage(String message) {
-			this.message = message;
-		}
-
-	    
-
-	    
+		}    
 }

@@ -17,60 +17,39 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cms.dto.ContentDTO;
-import com.cms.dto.ResponseContentDTO;
-import com.cms.model.Content;
+import com.cms.dto.ContentSearchDTO;
 import com.cms.service.ContentService;
 
 import java.util.HashMap;
 import java.util.Map;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/admin")
-@PreAuthorize("hasAuthoruty('Admin')")
+@RequestMapping("/content")
 public class ContentController {
 	
 	@Autowired
     private ContentService contentService;
 
-//	@PostMapping("/createcontent")
-//	public Content createContent(@RequestBody Content content) {
-//	    content.setCreatedDate(java.time.LocalDateTime.now());
-//	    content.setUpdatedDate(java.time.LocalDateTime.now());
-//	    System.out.println(content.toString());
-//	    return contentService.saveContent(content);
-//	}
-
-
 	@PostMapping("/createcontent")
-    public ResponseEntity<?> createContent(@RequestBody Content content) {
-        try {
-            Content savedContent = contentService.saveContent(content);
-            return ResponseEntity.ok(savedContent);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body("Error saving content: " + e.getMessage());
-        }
+    public Map<String, Object> createContent(@RequestBody ContentDTO content) {
+        return contentService.saveContent(content);
     }
 
 	@GetMapping("/fetchcontents")
-	public ResponseEntity<ResponseContentDTO> getAllContent() {
-        ResponseContentDTO responseDTO = contentService.getAllContents();
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+	public Map<String, Object> getAllContent(@RequestBody ContentSearchDTO contentSearchDTO) {
+        return contentService.getAllContents(contentSearchDTO);
     }
 
     @PutMapping("/updatecontent/{contentId}")
-    public ResponseEntity<String> updateContent(
-            @PathVariable Integer contentId, 
+    public Map<String, Object> updateContent(
+    		@PathVariable Integer contentId,
             @RequestBody ContentDTO contentDTO) {
-        Content updatedContent = contentService.updateContent(contentId, contentDTO);
-        return new ResponseEntity<>("Content updated successfully", HttpStatus.OK);
+        return contentService.updateContent(contentId, contentDTO);
     }
 
     @DeleteMapping("/deletecontent/{contentId}")
-    public ResponseEntity<String> deleteContentById(@PathVariable Integer contentId) {
-        Content deletedContent = contentService.deleteContentById(contentId);
-        return new ResponseEntity<>("Content deleted successfully", HttpStatus.OK);
-
+    public Map<String, Object> deleteContentById(@PathVariable Integer contentId) {
+        return contentService.deleteContentById(contentId);
     }
     
     @GetMapping("/fetchcontentcategory/{contentId}/{categoryId}")
@@ -107,15 +86,6 @@ public class ContentController {
         }
 
         return response;
-    }	
-//	@DeleteMapping("/deleteContent/{id}")
-//    public ResponseEntity<String> deleteContent(@PathVariable int id) {
-//        try {
-//            contentService.deleteContentById(id);
-//            return new ResponseEntity<>("Content deleted successfully", HttpStatus.OK);
-//        } catch (Exception e) {
-//            return new ResponseEntity<>("Failed to delete content: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
+    }
 	
 }

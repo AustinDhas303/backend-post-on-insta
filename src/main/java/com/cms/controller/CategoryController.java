@@ -1,5 +1,7 @@
 package com.cms.controller;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,17 +14,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cms.service.CategoryService;
 import com.cms.dto.CategoryDTO;
-import com.cms.dto.ResponseCategoryDTO;
+import com.cms.dto.CategorySearchDTO;
 import com.cms.model.Category;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
-@RequestMapping("/admin")
-@PreAuthorize("hasAuthoruty('Admin')")
+@RequestMapping("/category")
 public class CategoryController {
     
     @Autowired
@@ -30,15 +32,13 @@ public class CategoryController {
     
         
     @PostMapping("/createcategory")
-    public ResponseEntity<String>create(@RequestBody CategoryDTO  categoryDTO ){
-        Category category=categoryService.create(categoryDTO);
-        return new ResponseEntity<>("Category Saved Sucessfully",HttpStatus.CREATED);
+    public Map<String, Object> create(@RequestBody CategoryDTO  categoryDTO ){
+        return categoryService.create(categoryDTO);
     }
     
     @GetMapping("fetchcategory")
-    public ResponseEntity<ResponseCategoryDTO>getAllCategory(){
-        ResponseCategoryDTO responseDTO=categoryService.getAllCategorys();
-        return new ResponseEntity<>(responseDTO,HttpStatus.OK);
+    public Map<String, Object> getAllCategory(@RequestParam(required = false) String categoryName){
+        return categoryService.getAllCategorys(categoryName);
     }
     
     @GetMapping("/fetchcategory/{category_Id}")

@@ -8,6 +8,6 @@ public interface AuthService {
 
 	Map<String, Object> login(String emailId, String password);
 
-	String register(UserDTO userDTO);
+	Map<String, String> register(UserDTO userDTO);
 
 }

@@ -1,18 +1,18 @@
 package com.cms.service;
 
+import java.util.Map;
+
 import com.cms.dto.CategoryDTO;
-import com.cms.dto.ResponseCategoryDTO;
+import com.cms.dto.CategorySearchDTO;
 import com.cms.model.Category;
 
 public interface CategoryService {
 
-    
-
-    ResponseCategoryDTO getAllCategorys();
+    Map<String, Object> getAllCategorys(String categoryName);
 
     CategoryDTO getCategoryById(int category_Id);
 
-    Category create(CategoryDTO categoryDTO);
+    Map<String, Object> create(CategoryDTO categoryDTO);
 
     Category deleteCategorybyId(Integer categoryId);
 

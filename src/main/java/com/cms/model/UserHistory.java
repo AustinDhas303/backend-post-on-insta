@@ -17,7 +17,9 @@ package com.cms.model;
 	import jakarta.persistence.PrePersist;
 	import jakarta.persistence.PreUpdate;
 	import jakarta.persistence.Table;
+import lombok.Data;
 
+	@Data
 	@Entity
 	@Table(name="usersHistory")
 	public class UserHistory {
@@ -53,63 +55,5 @@ package com.cms.model;
 	   protected void onUpdate() {
 	       this.attemptedDate = LocalDateTime.now();
 	   }
-
-	public Long getUserHistoryId() {
-		return userHistoryId;
-	}
-
-	public void setUserHistoryId(Long userHistoryId) {
-		this.userHistoryId = userHistoryId;
-	}
-
-	public Integer getScores() {
-		return scores;
-	}
-
-	public void setScores(Integer scores) {
-		this.scores = scores;
-	}
-
-	public Integer getRewardsPoint() {
-		return rewardsPoint;
-	}
-
-	public void setRewardsPoint(Integer rewardsPoint) {
-		this.rewardsPoint = rewardsPoint;
-	}
-
-	public LocalDateTime getAttemptedDate() {
-	return attemptedDate;
-	}
-
-	public void setAttemptedDate(LocalDateTime attemptedDate) {
-	this.attemptedDate = attemptedDate;
-	}
-
-
-	public List<Map<String, String>> getJsonData() {
-	return jsonData;
-	}
-
-	public void setJsonData(List<Map<String, String>> jsonData) {
-	this.jsonData = jsonData;
-	}
-
-	public Content getContent() {
-	return content;
-	}
-
-	public void setContent(Content content) {
-	this.content = content;
-	}
-
-	public User getUser() {
-	return user;
-	}
-
-	public void setUser(User user) {
-	this.user = user;
-	}
-	 
 	
 	}
