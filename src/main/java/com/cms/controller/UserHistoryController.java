@@ -5,7 +5,6 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,8 +29,7 @@ import com.cms.service.UserHistoryService;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@PreAuthorize("hasAuthority('User')")
-@RequestMapping("/user")
+@RequestMapping("/userHistory")
 public class UserHistoryController {
 
 	 @Autowired
@@ -42,21 +39,14 @@ public class UserHistoryController {
 	 private ContentService contentService;
 
 	 @PostMapping("/createuserhistory")
-	 public ResponseEntity<Map<String, Object>> createUserHistory(@RequestBody UserHistoryDTO userHistoryDTO) {
-	     Map<String, Object> response = new HashMap<>();
-	     
-	     try {
-	         UserHistory userHistory = userHistoryService.createUserHistory(userHistoryDTO);
-	         response.put("success", true);
-	         response.put("message", "Quiz attempt saved successfully!");
-	         response.put("userHistory", userHistory);
-	     } catch (RuntimeException e) {
-	         response.put("success", false);
-	         response.put("message", "User already attempted the Quiz");
-	         response.put("userHistory", null);  // Ensuring the response structure remains consistent
-	     }
-
-	     return ResponseEntity.ok(response);
+	 public Map<String, String> createUserHistory(@RequestBody UserHistoryDTO userHistoryDTO) {
+	     return userHistoryService.createUserHistory(userHistoryDTO);
+	 }
+	 
+	 @GetMapping("/fetchalluserhistory")
+	 public ResponseEntity<UserHistoryResponseDTO> getAllUserHistory(@RequestParam int page, @RequestParam int size, @RequestParam String userName){
+		 UserHistoryResponseDTO responseUserHistoryDTO =userHistoryService.getAllUserHistory(page, size, userName);
+		 return new ResponseEntity<>(responseUserHistoryDTO,HttpStatus.OK);
 	 }
 	   
 	 @GetMapping("/user/{userid}/newquiz")

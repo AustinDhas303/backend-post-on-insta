@@ -11,19 +11,20 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.cms.dto.ContentDTO;
 import com.cms.dto.ContentSearchDTO;
-import com.cms.model.Category;
 import com.cms.model.Content;
 import com.cms.model.User;
 import com.cms.repository.ContentRepository;
 import com.cms.repository.UserHistoryRepository;
 import com.cms.repository.UserRepository;
-import com.cms.userCallBackRepository.ContentCallBackRepository;
+
 @Service
 public class ContentServiceImpl implements ContentService{
 	
@@ -36,8 +37,6 @@ public class ContentServiceImpl implements ContentService{
 	@Autowired
 	private UserRepository userRepository;
 
-	@Autowired
-	private ContentCallBackRepository contentCallBackRepository;
 	
 	@Override
 	public Map<String, Object> saveContent(ContentDTO contentDTO) {
@@ -159,21 +158,21 @@ public class ContentServiceImpl implements ContentService{
 		Map<String, Object> map = new HashMap<String, Object>();
 		int page = contentSearchDTO.getPage();
 		int size = contentSearchDTO.getSize();
-		page = page*size;
-		Integer contentId = contentSearchDTO.getContentId();
+		Pageable pageable = PageRequest.of(page, size);
 		String contentName = contentSearchDTO.getContentName();
-		Category category = contentSearchDTO.getCategory();
-		Integer status = contentSearchDTO.getStatus();
+		String categoryName = contentSearchDTO.getCategoryName();
 		
 		if(roleId == 1) {
-			list = contentCallBackRepository.getContents(page, size, contentId, contentName, category, status);
-			Map<String, Object> map2 = new HashMap<String, Object>();
+			list = contentRepository.getContents(pageable, contentName, categoryName);
 			for(Content c:list) {
+				Map<String, Object> map2 = new HashMap<String, Object>();
 				map2.put("contentId", c.getContentId());
 				map2.put("contentName", c.getContentName());
 				map2.put("jsonData", c.getJsonData());
 				map2.put("createdDate", c.getCreatedDate());
-				map2.put("category", c.getCategory());
+				map2.put("categoryName", c.getCategory().getCategoryName());
+				map2.put("categoryDescription", c.getCategory().getCategoryDescription());
+				map2.put("points", c.getCategory().getPoints());
 				list2.add(map2);
 			}
 		}

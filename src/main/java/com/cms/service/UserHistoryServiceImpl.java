@@ -1,11 +1,16 @@
 package com.cms.service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.cms.dto.UserHistoryResponseDTO;
@@ -36,124 +41,122 @@ public class UserHistoryServiceImpl implements UserHistoryService{
 
 
 	@Override
-	public UserHistory createUserHistory(UserHistoryDTO userHistoryDTO) {
-		
-	    // Fetch content and user
-	    Content content = contentRepository.findById(userHistoryDTO.getContentId())
-	            .orElseThrow(() -> new RuntimeException("Content not found"));
-	    User user = userRepository.findById(userHistoryDTO.getUserId())
-	            .orElseThrow(() -> new RuntimeException("User not found"));
+	public Map<String, String> createUserHistory(UserHistoryDTO userHistoryDTO) {
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String emailId = userDetails.getUsername();
+		User loggedInUser = userRepository.getEmail(emailId);
 
-	    System.out.println("///////"+userHistoryDTO.getContentId());
-	    System.out.println("///////"+content.getJsonData());
+		Map<String, String> map = new HashMap<String, String>();
+		if(loggedInUser.getRole().getRoleId() == 1 || loggedInUser.getRole().getRoleId() == 2) {
+			Content content = contentRepository.findById(userHistoryDTO.getContentId())
+		            .orElseThrow(() -> new RuntimeException("Content not found"));
+		    User user = userRepository.findById(userHistoryDTO.getUserId())
+		            .orElseThrow(() -> new RuntimeException("User not found"));
+
+		    System.out.println("///////"+userHistoryDTO.getContentId());
+		    System.out.println("///////"+content.getJsonData());
+		    
+		    Optional<UserHistory> existingAttempt = userHistoryRepository.findByUserIdAndContentId(user.getUserId(), userHistoryDTO.getContentId()); 
+		    if (existingAttempt.isPresent()) {
+		    	throw new RuntimeException("Error: You have already attempted this quiz."); 
+		    	}
+		    List<Map<String, String>> storedQuestions = content.getJsonData();
+		    List<Map<String, String>> userResponses = userHistoryDTO.getJsonData();
+
+		    int score = 0;
+		    int rewardsPoint=10;
+		    for (Map<String, String> response : userResponses) {
+		        String question = response.get("question");
+		        System.out.println(question);
+		        String userAnswer = response.get("selectedAnswer");
+		        System.out.println(userAnswer);
+
+		        if (question != null && userAnswer != null) {
+		        	System.out.println("//////////////");
+		            Map<String, String> storedQuestion = storedQuestions.stream()
+		                    .filter(q -> question.equals(q.get("question")))
+		                    .findFirst()
+		                    .orElse(null);
+		            
+		            System.out.println("quest "+storedQuestion);
+		            System.out.println("stored quest"+storedQuestions);
+
+		            
+		            if (storedQuestion != null) {
+		                String correctAnswer = storedQuestion.get("correctanswer");
+		                if (correctAnswer != null && correctAnswer.equals(userAnswer)) {
+		               
+		                	System.out.println("correctAnswer "+storedQuestion);
+		                    score += 10;
+		                    System.out.println("Score "+score);
+		                    
+		                    rewardsPoint+=2;
+		                }
+		            }
+		        }
+		    }
+
+//		    int rewardsPoint = score >= 80 ? 10 : score >= 50 ? 5 : 0;
+		    System.out.println("Reward point "+rewardsPoint);
+
+		    UserHistory userHistory = new UserHistory();
+		    userHistory.setJsonData(userResponses);
+		    userHistory.setScores(score);
+		    userHistory.setRewardsPoint(rewardsPoint);
+		    userHistory.setContent(content);
+		    userHistory.setUser(user);
+		    userHistoryRepository.save(userHistory);
+		    map.put("status", "success");
+		    map.put("message", "Quiz attempted successfully");
+		}
 	    
-	    Optional<UserHistory> existingAttempt = userHistoryRepository.findByUserIdAndContentId(user.getUserId(), userHistoryDTO.getContentId()); 
-	    if (existingAttempt.isPresent()) {
-	    	throw new RuntimeException("Error: You have already attempted this quiz."); 
-	    	}
-	    // Extract stored questions and user responses
-	    List<Map<String, String>> storedQuestions = content.getJsonData();
-	    List<Map<String, String>> userResponses = userHistoryDTO.getJsonData();
-
-	    // Calculate score
-	    int score = 0;
-	    int rewardsPoint=10;
-	    for (Map<String, String> response : userResponses) {
-	        String question = response.get("question");
-	        System.out.println(question);
-	        String userAnswer = response.get("selectedAnswer");
-	        System.out.println(userAnswer);
-
-	        if (question != null && userAnswer != null) {
-	            // Find the matching stored question
-	        	System.out.println("//////////////");
-	            Map<String, String> storedQuestion = storedQuestions.stream()
-	                    .filter(q -> question.equals(q.get("question")))
-	                    .findFirst()
-	                    .orElse(null);
-	            
-//	            String storedQuestion=
-	            
-	            System.out.println("quest "+storedQuestion);
-	            System.out.println("stored quest"+storedQuestions);
-
-	            
-	            if (storedQuestion != null) {
-	                String correctAnswer = storedQuestion.get("correctanswer");
-	                if (correctAnswer != null && correctAnswer.equals(userAnswer)) {
-	               
-	                	System.out.println("correctAnswer "+storedQuestion);
-	                    score += 10; // Assign points for correct answers
-	                    System.out.println("Score "+score);
-	                    
-	                    rewardsPoint+=2;
-	                }
-	            }
-	        }
-	    }
-
-	    // Calculate reward points
-//	    int rewardsPoint = score >= 80 ? 10 : score >= 50 ? 5 : 0;
-	    System.out.println("Reward point "+rewardsPoint);
-	    // Save UserHistory
-	    UserHistory userHistory = new UserHistory();
-	    userHistory.setJsonData(userResponses);
-	    userHistory.setScores(score);
-	    userHistory.setRewardsPoint(rewardsPoint);
-	    userHistory.setContent(content);
-	    userHistory.setUser(user);
-
-	    return userHistoryRepository.save(userHistory);
+	    return map;
 	}
 
 
 
 	@Override
-	public UserHistoryResponseDTO getAllUserHistory() {
+	public UserHistoryResponseDTO getAllUserHistory(int page, int size, String userName) {
 		// TODO Auto-generated method stub
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		String emailId = userDetails.getUsername();
+		User loggedInUser = userRepository.getEmail(emailId);
+
 		UserHistoryResponseDTO responseUserHistoryDTO=new UserHistoryResponseDTO();
-		List<UserHistoryDTO> userHistoryDTOs=new ArrayList<>();
-		List<UserHistory> userHistories =userHistoryRepository.findAll();
-		
-		for(UserHistory userHist:userHistories) {
-			UserHistoryDTO userHistoryDTO=new UserHistoryDTO();
-			userHistoryDTO.setUserHistoryId(userHist.getUserHistoryId());
-			userHistoryDTO.setScores(userHist.getScores());
-			userHistoryDTO.setRewardsPoint(userHist.getRewardsPoint());
-			userHistoryDTO.setJsonData(userHist.getJsonData());
-			 // Null check for user
-//			userHistoryDTO.setU
-			if (userHist.getUser() != null) {
-		          //  userHistoryDTO.setUserId(userHist.getUser().getUserId());
-		        	userHistoryDTO.setUserName(userHist.getUser().getFirstName() + " " + userHist.getUser().getLastName());
-		        } else {
-		        //    userHistoryDTO.setUserId(null); // Or handle as per your requirement
-		        	userHistoryDTO.setUserName(null);
-		        }
-		        // Null check for content
-		        if (userHist.getContent() != null) {
-		         //   userHistoryDTO.setContentId(userHist.getContent().getContentId());
-		        	userHistoryDTO.setContentName(userHist.getContent().getContentName());
-		        } else {
-		          //  userHistoryDTO.setContentId(null); // Or handle as per your requirement
-		        	userHistoryDTO.setContentName(null);
-		        }
-		        // Null check for content
-		        if (userHist.getContent() != null) {
-		            userHistoryDTO.setContentId(userHist.getContent().getContentId());
-//		        	userHistoryDTO.setContentName(userHist.getContent().getContentName());
-		        } else {
-		        	
-		            userHistoryDTO.setContentId(null); // Or handle as per your requirement
-		  
-//		        	userHistoryDTO.setContentName(null);
-		        }
-		       
-	userHistoryDTOs.add(userHistoryDTO);
-			}
-			responseUserHistoryDTO.setUserHistoryDTO(userHistoryDTOs);
-			return responseUserHistoryDTO;
+		if(loggedInUser.getRole().getRoleId() == 1) {
+			List<UserHistoryDTO> userHistoryDTOs=new ArrayList<>();
+			Pageable pageable = PageRequest.of(page, size);
+			List<UserHistory> userHistories =userHistoryRepository.getAllUserHistory(pageable, userName);
+			
+			for(UserHistory userHist:userHistories) {
+				UserHistoryDTO userHistoryDTO=new UserHistoryDTO();
+				userHistoryDTO.setUserHistoryId(userHist.getUserHistoryId());
+				userHistoryDTO.setScores(userHist.getScores());
+				userHistoryDTO.setRewardsPoint(userHist.getRewardsPoint());
+				userHistoryDTO.setJsonData(userHist.getJsonData());
+				 
+				if (userHist.getUser() != null) {
+			        	userHistoryDTO.setUserName(userHist.getUser().getFirstName() + " " + userHist.getUser().getLastName());
+			    } else {
+			        	userHistoryDTO.setUserName(null);
+			    }
+			    if (userHist.getContent() != null) {
+			       	userHistoryDTO.setContentName(userHist.getContent().getContentName());
+			    } else {
+			       	userHistoryDTO.setContentName(null);
+			    }
+			    if (userHist.getContent() != null) {
+			    	userHistoryDTO.setContentId(userHist.getContent().getContentId());
+			    } else {
+			        	
+			    	userHistoryDTO.setContentId(null);
+			    }
+			        userHistoryDTOs.add(userHistoryDTO);
+				}
+				responseUserHistoryDTO.setUserHistoryDTO(userHistoryDTOs);
 		}
+		return responseUserHistoryDTO;
+	}
 
 
 	@Override
@@ -255,17 +258,6 @@ public class UserHistoryServiceImpl implements UserHistoryService{
 	    }).collect(Collectors.toList());
 	}
 
-
-
-//	@Override
-//	public UserHistoryDTO fetchUserHistoryByusercontentId(Long userId, Long contentId) {
-//		// TODO Auto-generated method stub
-//		UserHistoryDTO userHistoryDTO=userHistoryRepository.findBy(userId, contentId);
-//		return null;
-//	}
-	
-	
-	
 	
 }
 
